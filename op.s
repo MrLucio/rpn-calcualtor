@@ -2,6 +2,9 @@
 #as --32 -o op.o op.s && ld -m elf_i386 -o op.x op.o && rm op.o && ./op.x
 #comando compilazione debugger
 #as --32 -gstabs -o op.o op.s && ld -m elf_i386 -o op.x op.o && rm op.o && gdb op.x
+#mostrare stack
+#x/100x $sp
+
 .section .data
 piu:
     .ascii "+"
@@ -12,7 +15,7 @@ per:
 div:
     .ascii "/"
 test:
-    .ascii "/"
+    .ascii "-"
 
 .section .text
     .global _start
@@ -21,16 +24,28 @@ _start:
     #4 2 +
     push $4
     push $2
-    popl %eax
     popl %ebx
-    movl (test), %ecx
-    cmp %ecx, (piu)
+    popl %eax
+    movb test, %cl
+
+    #somma
+    movb piu, %dl
+    cmp %cl, %dl
     je somma
-    cmp %ecx, (meno)
+
+    #sottrazione
+    movb meno, %dl
+    cmp %cl, %dl
     je sottrazione
-    cmp %ecx, (per)
+
+    #moltiplicazione
+    movb per, %dl
+    cmp %cl, %dl
     je moltiplicazione
-    cmp %ecx, (div)
+
+    #divisione
+    movb div, %dl
+    cmp %cl, %dl
     je divisione
 
 somma:
@@ -43,10 +58,10 @@ sottrazione:
 
 moltiplicazione:
     imul %ebx
-    movl %edx, %eax
     jmp exit
 
 divisione:
+    movl $0, %edx
     idiv %ebx
     jmp exit
 
