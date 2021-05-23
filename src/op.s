@@ -14,8 +14,10 @@ per:
     .ascii "*"
 div:
     .ascii "/"
+neg:
+    .byte 1
 test:
-    .ascii "-"
+    .ascii "-4"
 
 .section .text
     .global _start
@@ -26,31 +28,36 @@ _start:
     push $2
     popl %ebx
     popl %eax
-    movb test, %cl
+    movb $0, neg
+    leal test, %esi
+    movb (%esi), %cl
 
     #somma
-    movb piu, %dl
-    cmp %cl, %dl
+    cmpb %cl, piu
     je somma
 
     #sottrazione
-    movb meno, %dl
-    cmp %cl, %dl
-    je sottrazione
+    cmp %cl, meno
+    je minus
 
     #moltiplicazione
-    movb per, %dl
-    cmp %cl, %dl
+    cmp %cl, per
     je moltiplicazione
 
     #divisione
-    movb div, %dl
-    cmp %cl, %dl
+    cmp %cl, div
     je divisione
 
 somma:
     add %ebx, %eax
     jmp exit
+
+minus:
+    cmpb $' ', 1(%esi) 
+    je sottrazione
+    movb $1, neg
+    jmp exit
+
 
 sottrazione:
     sub %ebx, %eax
