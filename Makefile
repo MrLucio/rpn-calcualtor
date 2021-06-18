@@ -1,6 +1,7 @@
 all:
 	gcc -m32 -gstabs -c src/input.s -o obj/input.o
 	gcc -m32 -gstabs -c src/strcpy.s -o obj/strcpy.o
+	gcc -m32 -gstabs -c src/itoa.s -o obj/itoa.o
 	gcc -m32 -gstabs -c src/main.c -o obj/main.o
-	gcc -m32 -gstabs obj/input.o obj/strcpy.o obj/main.o -o bin/a.out
-	./bin/a.out test/in1.txt test/out1.txt
+	gcc -m32 -gstabs obj/input.o obj/strcpy.o obj/itoa.o obj/main.o -o bin/a.out
+	./bin/a.out test/in_1.txt test/out_1.txt

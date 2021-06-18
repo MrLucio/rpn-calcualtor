@@ -3,10 +3,11 @@
     intero: .long 0
 
 .section .data
+    esp_value: .long 0
     error: .ascii "Invalid\0"
     output: .ascii ""
-    op: .byte 1
-    neg: .byte 1
+    op: .byte 0
+    neg: .byte 0
 
 .section .text
     .global postfix
@@ -20,10 +21,14 @@ postfix:
     pushl %esi          # 
     pushl %edi          #
 
-    movl 28(%esp), %esi # recupero l'indirizzo di input
-    movl 32(%esp), %edi # recupero l'indirizzo di output
+    movl %esp, esp_value
 
-ciclo:
+    movl 28(%esp), %esi     # recupero l'indirizzo di input
+    movl 32(%esp), %edi     # recupero l'indirizzo di output
+
+    movl $0, neg
+
+cicle:
 
     xorl %ebx, %ebx     # azzero ebx
     movl $0, cifra      # azzero la cifra
@@ -33,26 +38,30 @@ ciclo:
     inc %esi            # punto al prossimo carattere
 
     cmp $0, %bl         # cifra == '\0'
-    je fine
+    je check_result
 
     cmp $' ', %bl       # cifra == ' '
-    je salva_intero
+    je save_result
 
 check_op:
 
+    movb $1, op
+
     cmpb $'+', %bl          # somma
-    je my_sum
+    je _sum
 
     cmpb $'-', %bl          # sottrazione
     je check_neg
 
     cmpb $'*', %bl          # moltiplicazione
-    je my_mul
+    je _mul
 
     cmpb $'/', %bl          # divisione
-    je my_div
+    je _div
 
 check_int:
+
+    movb $0, op
 
     subl $'0', %ebx     # converto il carattere in intero
 
@@ -67,62 +76,73 @@ check_int:
     mull intero         # l'intero si troverà in eax 
 
     addl cifra, %eax    # sommo la cifra al nuovo intero
-    movl %eax, intero   # 
+    movl %eax, intero   # salvo il nuovo intero
 
     # -----------------------
 
-    jmp ciclo
+    jmp cicle
 
 check_neg:
 
-    cmpb $' ', 1(%esi)
-    je my_sub
+    cmpb $' ', (%esi)
+    je _sub
 
-    cmpb $0, 1(%esi)
-    je my_sub
+    cmpb $0, (%esi)
+    je _sub
 
-    cmpb $'0', 1(%esi)      # il carattere non è intero (< 0)
+    cmpb $'0', (%esi)      # il carattere non è intero (< 0)
     jl errore
-    cmpb $'9', 1(%esi)      # il carattere non è intero (> 9)
+    cmpb $'9', (%esi)      # il carattere non è intero (> 9)
     jg errore
 
     movb $1, neg
 
-    jmp ciclo
+    jmp cicle
 
-my_sum:
+save_result:
+
+    cmp $1, op
+    je cicle
+
+    movl intero, %eax
+    cmp $0, neg
+    je save_integer
+
+    neg %eax
+
+save_integer:
+
+    pushl %eax
+
+    movl $0, neg
+    movl $0, intero
+
+    jmp cicle
+
+_sum:
     popl %eax               # carico il primo numero in eax
     addl %eax, (%esp)       # sommo e carico il risultato in eax
-    jmp ciclo
+    jmp cicle
 
-my_sub:
+_sub:
     popl %eax
     sub %eax, (%esp)        # (%esp) = eax - ebx
-    jmp ciclo
+    jmp cicle
 
-my_mul:
+_mul:
     popl %eax
     popl %ecx
     imul %ecx             # eax = eax * ecx
     pushl %eax
-    jmp ciclo
+    jmp cicle
 
-my_div:
+_div:
     xorl %edx, %edx
     popl %ecx
     popl %eax
     idiv %ecx             # eax = eax / ecx
     pushl %eax
-    jmp ciclo
-
-salva_intero:
-
-    pushl intero
-
-    movl $0, neg
-    movl $0, intero
-
-    jmp ciclo
+    jmp cicle
 
 errore:
 
@@ -135,14 +155,29 @@ errore:
 
     addl $8, %esp       #
 
+    jmp fine
+
+check_result:
+    popl %eax
+    cmp $0, %eax
+    jge write_result
+
+    neg %eax
+    movl $'-', (%edi)
+    incl %edi
+
+write_result:
+
+    #pushl %edi          # specifico l'output per la funzione itoa
+    call itoa           # carico il risultato sull'output
+
 fine:
 
-    popl %eax
-    movl %eax, (%edi)  # carico il risultato sull'output
+    movl esp_value, %esp    # ripristino esp, ignorando tutti gli elementi pushati
 
     popl %edi           #
-    popl %esi           # ripristino i valori dei registri general purpose
-    popl %edx           #
+    popl %esi           #
+    popl %edx           # ripristino i valori dei registri general purpose
     popl %ecx           #
     popl %ebx           #
     popl %eax           #

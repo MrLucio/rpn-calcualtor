@@ -14,20 +14,20 @@ strcpy:
     movl 16(%esp), %esi
     movl 20(%esp), %edi
 
+    cld # clear direction flag
+
 ciclo:
 
     cmp $0, (%esi)
     je fine
 
-    movb (%esi), %al
-    movb %al, (%edi)
+    movsb
 
-    inc %esi
-    inc %edi
-
-    jmp ciclo    
+    jmp ciclo
 
 fine:
+
+    movb $0, (%edi)
 
     popl %edi           #
     popl %esi           # salvo i valori dei registri general purpose
