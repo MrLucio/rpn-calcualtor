@@ -1,11 +1,8 @@
-.section .bss
-    cifra: .long 0
-    intero: .long 0
-
 .section .data
+    digit: .long 0
+    integer: .long 0
     esp_value: .long 0
-    error: .ascii "Invalid\0"
-    output: .ascii ""
+    invalid_str: .ascii "Invalid\0"
     op: .byte 0
     neg: .byte 0
 
@@ -31,7 +28,7 @@ postfix:
 cicle:
 
     xorl %ebx, %ebx     # azzero ebx
-    movl $0, cifra      # azzero la cifra
+    movl $0, digit      # azzero la cifra
 
     movb (%esi), %bl    # carico un carattere dall'input
 
@@ -70,13 +67,13 @@ check_int:
     cmp $9, %ebx        # il carattere non è intero (> 9)
     jg errore
 
-    movl %ebx, cifra    # salvo la cifra
+    movl %ebx, digit    # salvo la cifra
 
     movl $10, %eax      # moltiplico l'intero per 10
-    mull intero         # l'intero si troverà in eax 
+    mull integer         # l'intero si troverà in eax 
 
-    addl cifra, %eax    # sommo la cifra al nuovo intero
-    movl %eax, intero   # salvo il nuovo intero
+    addl digit, %eax    # sommo la cifra al nuovo intero
+    movl %eax, integer   # salvo il nuovo intero
 
     # -----------------------
 
@@ -104,7 +101,7 @@ save_result:
     cmp $1, op
     je cicle
 
-    movl intero, %eax
+    movl integer, %eax
     cmp $0, neg
     je save_integer
 
@@ -115,7 +112,7 @@ save_integer:
     pushl %eax
 
     movl $0, neg
-    movl $0, intero
+    movl $0, integer
 
     jmp cicle
 
@@ -146,7 +143,7 @@ _div:
 
 errore:
 
-    leal error, %esi    # carico l'indirizzo della variabile d'errore
+    leal invalid_str, %esi    # carico l'indirizzo della variabile d'errore
 
     pushl %edi          # carico l'indirizzo di output
     pushl %esi          # carico l'indirizzo della variabile d'errore

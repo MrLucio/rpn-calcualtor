@@ -1,7 +1,5 @@
 .section .data
-
-car: .byte 0			# la variabile car e' dichiarata di tipo byte
-neg: .byte 0
+    neg: .byte 0
 
 .section .text
 	.global itoa

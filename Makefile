@@ -4,4 +4,4 @@ all:
 	gcc -m32 -gstabs -c src/itoa.s -o obj/itoa.o
 	gcc -m32 -gstabs -c src/main.c -o obj/main.o
 	gcc -m32 -gstabs obj/input.o obj/strcpy.o obj/itoa.o obj/main.o -o bin/a.out
-	./bin/a.out test/in_1.txt test/out_1.txt
+	./bin/a.out test/in_3.txt test/out_3.txt

@@ -1,5 +1,3 @@
-.section .data
-
 .section .text
     .global strcpy
 
@@ -7,12 +5,11 @@
 
 strcpy:
 
-    pushl %eax          #
     pushl %esi          # salvo i valori dei registri general purpose
     pushl %edi          #
 
-    movl 16(%esp), %esi
-    movl 20(%esp), %edi
+    movl 12(%esp), %esi
+    movl 16(%esp), %edi
 
     cld # clear direction flag
 
@@ -31,6 +28,5 @@ fine:
 
     popl %edi           #
     popl %esi           # salvo i valori dei registri general purpose
-    popl %eax           #
 
 ret
