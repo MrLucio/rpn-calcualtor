@@ -13,9 +13,9 @@ itoa:
     pushl %ebx
     pushl %ecx
     pushl %edx
-    #pushl %edi
+    pushl %edi
 
-    #movl 20(%esp), %edi
+    movl 20(%esp), %edi
 
 	movl $0, %ecx		# carica il numero 0 in %ecx
 
@@ -56,7 +56,7 @@ stampa:
 
 fine:
 
-    #popl %edi
+    popl %edi
     popl %edx
     popl %ecx
     popl %ebx

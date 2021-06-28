@@ -11,17 +11,16 @@
 
 postfix:
 
-    pushl %eax          #
     pushl %ebx          #
-    pushl %ecx          # salvo i valori dei registri general purpose
-    pushl %edx          #
+    pushl %ecx          #
+    pushl %edx          # salvo i valori dei registri general purpose
     pushl %esi          # 
     pushl %edi          #
 
     movl %esp, esp_value
 
-    movl 28(%esp), %esi     # recupero l'indirizzo di input
-    movl 32(%esp), %edi     # recupero l'indirizzo di output
+    movl 24(%esp), %esi     # recupero l'indirizzo di input
+    movl 28(%esp), %edi     # recupero l'indirizzo di output
 
     movl $0, neg
 
@@ -165,7 +164,7 @@ check_result:
 
 write_result:
 
-    #pushl %edi          # specifico l'output per la funzione itoa
+    pushl %edi          # specifico l'output per la funzione itoa
     call itoa           # carico il risultato sull'output
 
 fine:
@@ -177,6 +176,5 @@ fine:
     popl %edx           # ripristino i valori dei registri general purpose
     popl %ecx           #
     popl %ebx           #
-    popl %eax           #
 
 ret
