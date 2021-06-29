@@ -4,10 +4,7 @@
 .section .text
 	.global itoa
 
-.type itoa, @function		# dichiarazione della funzione itoa che
-				# converte un intero in una stringa
-				# il numero da convertire deve essere
-				# stato caricato nel registro %eax
+.type itoa, @function # il numero da convertire si trova in eax
 
 itoa:
     pushl %ebx
