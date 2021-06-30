@@ -11,22 +11,24 @@ strcpy:
     movl 12(%esp), %esi
     movl 16(%esp), %edi
 
-    cld # clear direction flag
+    cld                 # clear direction flag
 
-ciclo:
+cicle:
 
-    cmp $0, (%esi)
-    je fine
+    cmp $0, (%esi)      # controllo se ho raggiunto lo \0
+    je end
 
-    movsb
+    movsb               # copia il primo byte dalla posizione
+                        # puntata da esi al primo byte
+                        # della posizione puntata da edi
 
-    jmp ciclo
+    jmp cicle
 
-fine:
+end:
 
     movb $0, (%edi)
 
     popl %edi           #
-    popl %esi           # salvo i valori dei registri general purpose
+    popl %esi           # ripristino i valori dei registri general purpose
 
 ret

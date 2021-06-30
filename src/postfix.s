@@ -60,9 +60,9 @@ check_int:
     movb $0, op         # op = false
 
     cmpb $'0', %bl      # il carattere non rappresenta un intero (< '0')
-    jl errore
+    jl error
     cmpb $'9', %bl      # il carattere non rappresenta un intero (> '9')
-    jg errore
+    jg error
 
     subb $'0', %bl      # converto il carattere nell'intero rappresentato
 
@@ -74,18 +74,18 @@ check_int:
 
     jmp cicle           # ricomincio il ciclo
 
-check_neg:              # 
+check_neg:
 
-    cmpb $' ', (%esi)
+    cmpb $' ', (%esi)      # controllo se il carattere successivo è uno spazio
     je _sub
 
     cmpb $0, (%esi)
     je _sub
 
     cmpb $'0', (%esi)      # il carattere non è intero (< 0)
-    jl errore
+    jl error
     cmpb $'9', (%esi)      # il carattere non è intero (> 9)
-    jg errore
+    jg error
 
     movb $1, neg
 
@@ -94,7 +94,7 @@ check_neg:              #
 save_result:
 
     cmpb $' ', (%esi)       # presenza di due caratteri spazio
-    je errore
+    je error
 
     cmpb $1, op             # il carattere precedente era un operando
     je cicle
@@ -105,7 +105,7 @@ save_result:
 
     neg %eax
 
-save_integer:
+save_integer:               # salvo l'intero contenuto in eax
 
     pushl %eax
 
@@ -121,13 +121,13 @@ _sum:
 
 _sub:
     popl %eax
-    subl %eax, (%esp)      # (esp) = (esp) - eax
+    subl %eax, (%esp)     # (esp) = (esp) - eax
     jmp cicle
 
 _mul:
     popl %eax
     popl %ecx
-    imull %ecx             # eax = eax * ecx
+    imull %ecx            # eax = eax * ecx
     pushl %eax
     jmp cicle
 
@@ -135,11 +135,11 @@ _div:
     xorl %edx, %edx       # pulisco edx
     popl %ecx
     popl %eax
-    idivl %ecx             # eax = eax / ecx
+    idivl %ecx            # eax = eax / ecx
     pushl %eax
     jmp cicle
 
-errore:
+error:
 
     leal invalid_str, %esi    # carico l'indirizzo della variabile d'errore
 
@@ -153,7 +153,7 @@ errore:
 check_result:
 
     popl %eax           # l'ultimo elemento sullo stack sarà il risultato
-    cmpl $0, %eax        # controllo se il risultato è negativo
+    cmpl $0, %eax       # controllo se il risultato è negativo
     jge write_result
 
     neg %eax            # il risultato è negativo, lo nego e diventa positivo

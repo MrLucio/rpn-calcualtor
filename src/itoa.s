@@ -4,58 +4,57 @@
 .section .text
 	.global itoa
 
-.type itoa, @function # il numero da convertire si trova in eax
+.type itoa, @function   # il numero da convertire si trova in eax
 
 itoa:
-    pushl %ebx
-    pushl %ecx
-    pushl %edx
-    pushl %edi
+    pushl %ebx          #
+    pushl %ecx          #
+    pushl %edx          #  salvo i valori dei registri general purpose
+    pushl %edi          #
 
     movl 20(%esp), %edi
 
 	movl $0, %ecx		# carica il numero 0 in %ecx
 
-    cmp $0, %eax
-    jge compara
-    neg %eax
+    cmpl $0, %eax       # controllo se il numero è minore di 0
+    jge cicle
+    neg %eax            # nego il numero
     movl $1, neg
 
-compara:
-    cmp $10, %eax
-    jge dividi
-    inc %ecx
-    push %eax
-    jmp stampa
+cicle:
+    cmpl $10, %eax      # controllo se il numero ha più di una cifra
+    jge divide
+    inc %ecx            # incremento il contatore di cifre trovate
+    push %eax           # salvo la cifra (sarà l'ultima)
+    jmp write
 
-dividi:
+divide:
     xorl %edx, %edx
     movl $10, %ebx
-    divl %ebx
-    inc %ecx
-    push %edx
-    jmp compara
+    divl %ebx           # eax = eax / ebx
+    inc %ecx            # incremento il contatore di cifre trovate
+    push %edx           # la cifra si trova in edx, la carico sullo stack
+    jmp cicle
 
-stampa_neg:
-    movl $'-', (%edi)
+write_neg:
+    movl $'-', (%edi)   # aggiugno il carattere '-' sull'output
     inc %edi
     movl $0, neg
-    jmp stampa
 
-stampa:
-    cmp $1, neg
-    je stampa_neg
-    popl %eax
-    addl $'0', %eax
-    movl %eax, (%edi)
-    inc %edi
-    loop stampa
+write:
+    cmpb $1, neg        # controllo se il numero è negativo
+    je write_neg
+    popl %eax           # recupero una cifra dallo stack
+    addl $'0', %eax     # converto la cifra in carattere
+    movl %eax, (%edi)   # scrivo il carattere sulla posizione di output
+    inc %edi            # punto alla prossima posizione di output
+    loop write          # continuo finchè ecx != 0
 
 fine:
 
-    popl %edi
-    popl %edx
-    popl %ecx
-    popl %ebx
+    popl %edi           #
+    popl %edx           #
+    popl %ecx           # ripristino i valori dei registri general purpose
+    popl %ebx           #
 
     ret
